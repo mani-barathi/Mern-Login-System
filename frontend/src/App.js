@@ -12,11 +12,11 @@ function App() {
         <>
           <Navbar setUser={setUser} />
           <div className="container">
-            <h6>{'User has Logged In!'}</h6>
+            <h6>{`${user.name} has Logged In!`}</h6>
           </div>
         </>
       ) : (
-          <Login />
+          <Login setUser={setUser} />
         )}
     </div>
   );

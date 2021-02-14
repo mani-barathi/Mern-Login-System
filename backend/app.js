@@ -15,6 +15,8 @@ app.use(cors({
     credentials: true                         // enable set cookie
 }))
 
+app.use(express.json());                            // for json 
+app.use(express.urlencoded({ extended: true }));    // x-www-form-urlencoded header requests
 
 mongoose.connect(process.env.DB_URL, {
     useNewUrlParser: true,
@@ -40,11 +42,11 @@ app.use(session({
 
 app.get('/', (req, res) => {
     console.log(req.session.id)
-    res.header("Access-Control-Allow-Origin", process.env.ORIGIN)
+    // res.header("Access-Control-Allow-Origin", process.env.ORIGIN)
     res.json({ message: "getting requset ...Happy codding" })
 })
 
-
+// Routes
 app.use('/auth', authRoutes)
 
 

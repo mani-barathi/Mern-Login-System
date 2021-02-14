@@ -1,19 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react'
 
-function Login() {
+function Login({ setUser }) {
     const [isLogin, setIsLogin] = useState(true)
-    const [error, setError] = useState(null)
+    const [feedback, setFeedback] = useState({ message: '' })
     const formRef = useRef()
 
     useEffect(() => {
         const makeRequest = async () => {
             try {
-                const response = await fetch('http://localhost:5000/', {
+                const response = await fetch('http://localhost:5000/auth/islogged', {
                     credentials: "include",
-                    headers: { "Content-Type": 'application/json' },
+                    method: 'POST',
                 })
                 const data = await response.json()
                 console.log(data)
+                if (data.report)
+                    setUser(data.user)
             }
             catch (error) {
                 console.log("ERROR:", error)
@@ -22,19 +24,75 @@ function Login() {
         makeRequest()
     }, [])
 
-    const handleFormSubmit = (event) => {
+    const handleFormSubmit = async (event) => {
         event.preventDefault()
-        console.log('form submitted!!')
+        const user = {
+            email: formRef.current.email.value,
+            password: formRef.current.password.value,
+        }
+        if (!isLogin) {  // Sign UP
+            user.name = formRef.current.name.value
+            if (user.password != formRef.current.confirmPassword.value)
+                return alert('Passwords do not match')
+
+            try {
+                const response = await fetch('http://localhost:5000/auth/signup', {
+                    credentials: "include",
+                    method: 'POST',
+                    body: JSON.stringify(user),
+                    headers: { "Content-Type": 'application/json' },
+                })
+                const data = await response.json()
+                console.log(data)
+                if (data.report) {
+                    setFeedback({ message: `${data.message}, Login to Continue`, type: 1 })
+                    setIsLogin(true)
+                } else {
+                    setFeedback({ message: data.message, type: 0 })
+                    formRef.current.password.value = ''
+                    formRef.current.confirmPassword.value = ''
+                }
+            }
+            catch (error) {
+                console.log("ERROR:", error)
+            }
+
+        } else {   // Login
+            try {
+                const response = await fetch('http://localhost:5000/auth/login', {
+                    credentials: "include",
+                    method: 'POST',
+                    body: JSON.stringify(user),
+                    headers: { "Content-Type": 'application/json' },
+                })
+                const data = await response.json()
+                console.log(data)
+                if (data.report) {
+                    setUser(data.user)
+                } else {
+                    setFeedback({ message: data.message, type: 0 })
+                    formRef.current.password.value = ''
+                }
+            }
+            catch (error) {
+                console.log("ERROR:", error)
+            }
+        }
     }
 
-    // To clear Form Fields while user Switches between login and signup
-    useEffect(() => {
+    const clearFormFields = () => {
         formRef.current.email.value = ''
         formRef.current.password.value = ''
         if (!isLogin) {
             formRef.current.name.value = ''
             formRef.current.confirmPassword.value = ''
         }
+    }
+
+    // To clear Form Fields while user Switches between login and signup
+    useEffect(() => {
+        setFeedback({ message: '' })
+        clearFormFields()
     }, [isLogin])
 
     return (
@@ -72,10 +130,10 @@ function Login() {
                         </div>
                     }
 
-                    {error && /* Error */
+                    {feedback.message && /* Error or Success Message */
                         <div className="form-group">
-                            <h6 className="text-center text-danger">
-                                {error}
+                            <h6 className={`text-center ${feedback.type === 1 ? 'text-success' : 'text-danger'}`}>
+                                {feedback.message}
                             </h6>
                         </div>
                     }
