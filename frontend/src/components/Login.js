@@ -5,6 +5,23 @@ function Login() {
     const [error, setError] = useState(null)
     const formRef = useRef()
 
+    useEffect(() => {
+        const makeRequest = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/', {
+                    credentials: "include",
+                    headers: { "Content-Type": 'application/json' },
+                })
+                const data = await response.json()
+                console.log(data)
+            }
+            catch (error) {
+                console.log("ERROR:", error)
+            }
+        }
+        makeRequest()
+    }, [])
+
     const handleFormSubmit = (event) => {
         event.preventDefault()
         console.log('form submitted!!')

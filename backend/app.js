@@ -1,9 +1,51 @@
+require('dotenv').config()
 const express = require('express')
-
+const mongoose = require('mongoose')
+const session = require('express-session')
+const MongoStore = require('connect-mongodb-session')(session)
+const cors = require('cors')
 const app = express()
 
+// importing Routes
+const authRoutes = require('./routes/auth')
+
+app.use(cors({
+    origin: [process.env.ORIGIN],              //frontend url
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true                         // enable set cookie
+}))
+
+
+mongoose.connect(process.env.DB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+    .then(() => console.log("mongoDB connected ....!"))
+
+
+const store = new MongoStore({
+    url: process.env.DB_URL,
+    collection: 'mySession'
+})
+store.on('error', (err) => console.log(err))
+
+
+app.use(session({
+    secret: 'Keyboard cat',
+    store: store,
+    resave: false,
+    saveUninitialized: true
+}))
+
+
 app.get('/', (req, res) => {
-    res.send('Hello World!!')
+    console.log(req.session.id)
+    res.header("Access-Control-Allow-Origin", process.env.ORIGIN)
+    res.json({ message: "getting requset ...Happy codding" })
 })
 
-app.listen(5000, () => console.log(`App listening at http://localhost:5000/`))
+
+app.use('/auth', authRoutes)
+
+
+app.listen(process.env.PORT, () => console.log(`App running at http://localhost:${process.env.PORT}/`))
