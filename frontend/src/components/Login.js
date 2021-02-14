@@ -1,32 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { useStateValue } from "../contexts/StateContext"
+import useAuth from "../hooks/useAuth"
 
 function Login() {
-    const [, dispatch] = useStateValue()
+    const { login, signup, checkLoggedIn } = useAuth()
     const [isLogin, setIsLogin] = useState(true)
     const [feedback, setFeedback] = useState({ message: '' })
+    const [isNewAccoutCreated, setIsNewAccountCreated] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const formRef = useRef()
 
     useEffect(() => {
         const makeRequest = async () => {
-            try {
-                const response = await fetch('http://localhost:5000/auth/islogged', {
-                    credentials: "include",
-                    method: 'POST',
-                })
-                const data = await response.json()
-                console.log(data)
-                if (data.report)
-                    dispatch({ type: 'SET_USER', payload: data.user })
+            const isLogged = await checkLoggedIn()
+            if (!isLogged)
                 setIsLoading(false)
-            }
-            catch (error) {
-                console.log("ERROR:", error)
-            }
         }
         makeRequest()
-        return () => { }
     }, [])
 
     const handleFormSubmit = async (event) => {
@@ -35,52 +24,33 @@ function Login() {
             email: formRef.current.email.value,
             password: formRef.current.password.value,
         }
+
         if (!isLogin) {  // Sign UP
             user.name = formRef.current.name.value
             if (user.password != formRef.current.confirmPassword.value)
                 return alert('Passwords do not match')
 
-            try {
-                const response = await fetch('http://localhost:5000/auth/signup', {
-                    credentials: "include",
-                    method: 'POST',
-                    body: JSON.stringify(user),
-                    headers: { "Content-Type": 'application/json' },
-                })
-                const data = await response.json()
-                console.log(data)
-                if (data.report) {
-                    setFeedback({ message: `${data.message}, Login to Continue`, type: 1 })
-                    setIsLogin(true)
-                } else {
-                    setFeedback({ message: data.message, type: 0 })
-                    formRef.current.password.value = ''
-                    formRef.current.confirmPassword.value = ''
-                }
+            const response = await signup(user)
+            console.log(response)
+            if (!response.report) {
+                setFeedback({ message: response.message, type: 0 })
+                formRef.current.password.value = ''
+                formRef.current.confirmPassword.value = ''
+            } else {
+                setIsLogin(true)
+                setIsNewAccountCreated(true)
+                setFeedback({ message: `${response.message}, Login To Continue`, type: 1 })
+                setTimeout(() => {
+                    setFeedback(false)
+                    setFeedback({ message: '' })
+                }, 10000)
             }
-            catch (error) {
-                console.log("ERROR:", error)
-            }
-
         } else {   // Login
-            try {
-                const response = await fetch('http://localhost:5000/auth/login', {
-                    credentials: "include",
-                    method: 'POST',
-                    body: JSON.stringify(user),
-                    headers: { "Content-Type": 'application/json' },
-                })
-                const data = await response.json()
-                console.log(data)
-                if (data.report) {
-                    dispatch({ type: 'SET_USER', payload: data.user })
-                } else {
-                    setFeedback({ message: data.message, type: 0 })
-                    formRef.current.password.value = ''
-                }
-            }
-            catch (error) {
-                console.log("ERROR:", error)
+            const response = await login(user)
+            console.log(response)
+            if (!response.report) {
+                setFeedback({ message: response.message, type: 0 })
+                formRef.current.password.value = ''
             }
         }
     }
@@ -97,7 +67,8 @@ function Login() {
     // To clear Form Fields while user Switches between login and signup
     useEffect(() => {
         if (isLoading) return
-        setFeedback({ message: '' })
+        if (!isNewAccoutCreated)
+            setFeedback({ message: '' })
         clearFormFields()
     }, [isLogin])
 
