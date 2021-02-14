@@ -1,6 +1,8 @@
 import React from 'react'
+import { useStateValue } from "../contexts/StateContext"
 
-function Navbar({ setUser }) {
+function Navbar() {
+    const [, dispatch] = useStateValue()
 
     const logout = async () => {
         try {
@@ -11,7 +13,7 @@ function Navbar({ setUser }) {
             const data = await response.json()
             console.log(data)
             if (data.report)
-                setUser(null)
+                dispatch({ type: 'SET_USER', payload: null })
             else
                 alert('Something went wrong on Server')
         }

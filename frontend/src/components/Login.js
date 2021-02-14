@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { useStateValue } from "../contexts/StateContext"
 
-function Login({ setUser }) {
+function Login() {
+    const [, dispatch] = useStateValue()
     const [isLogin, setIsLogin] = useState(true)
     const [feedback, setFeedback] = useState({ message: '' })
     const [isLoading, setIsLoading] = useState(true)
@@ -16,7 +18,7 @@ function Login({ setUser }) {
                 const data = await response.json()
                 console.log(data)
                 if (data.report)
-                    setUser(data.user)
+                    dispatch({ type: 'SET_USER', payload: data.user })
                 setIsLoading(false)
             }
             catch (error) {
@@ -71,7 +73,7 @@ function Login({ setUser }) {
                 const data = await response.json()
                 console.log(data)
                 if (data.report) {
-                    setUser(data.user)
+                    dispatch({ type: 'SET_USER', payload: data.user })
                 } else {
                     setFeedback({ message: data.message, type: 0 })
                     formRef.current.password.value = ''
