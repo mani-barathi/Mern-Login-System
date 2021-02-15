@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
         const newPost = await new Post(post)
         newPost.save()
         console.log(`${newPost.authorName} has uploaded a New Post`)
-        res.status(201).json({ message: "post created", report: true, post: { text: "hello", imageUrl: "image.jpg" } })
+        res.status(201).json({ message: "post created", report: true, post: newPost })
     }
     else {
         res.status(401).json({ message: "Unauthorized Access", report: false })

@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import { useStateValue } from "../contexts/StateContext"
 
 function PostForm() {
-    const [{ user }] = useStateValue()
+    const [{ user }, dispatch] = useStateValue()
     const formRef = useRef()
     const [selectedImage, setSelectedImage] = useState(null)
 
@@ -18,7 +18,6 @@ function PostForm() {
             post.imageName = selectedImage.name
             post.imageData = selectedImage.data
         }
-        console.log(post)
 
         try {
             const response = await fetch('http://localhost:5000/api/post', {
@@ -28,9 +27,10 @@ function PostForm() {
                 headers: { "Content-Type": 'application/json' },
             })
             const data = await response.json()
-            console.log(data)
-            formRef.current.reset()
-
+            if (data.report) {
+                dispatch({ type: 'SET_NEW_POST', payload: data.post })
+                formRef.current.reset()
+            }
         } catch (error) {
             console.log(error)
         }

@@ -1,10 +1,10 @@
-import { useContext, createContext, useReducer } from 'react'
+import { useReducer, createContext, useContext } from "react"
 
 const StateContext = createContext()
 
-function StateProvider({ children, intialState, reducer }) {
+function StateProvider({ children, reducer, intialState }) {
     return (
-        <StateContext.Provider value={useReducer(reducer, intialState)}>
+        <StateContext.Provider value={useReducer(reducer, intialState)}  >
             {children}
         </StateContext.Provider>
     )

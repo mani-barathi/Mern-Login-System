@@ -5,7 +5,7 @@ function Navbar() {
     const { logout } = useAuth()
 
     return (
-        <nav className="navbar navbar-dark bg-dark">
+        <nav className="navbar sticky-top navbar-dark bg-dark">
             <a className="navbar-brand" href="#">Mern App</a>
 
             <button onClick={logout}
