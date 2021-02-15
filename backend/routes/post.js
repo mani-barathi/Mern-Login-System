@@ -3,9 +3,15 @@ const Post = require('../models/Post')
 const cloudinary = require("../utils/cloudinary")
 const router = Router()
 
-router.get('/', (req, res) => {
-    const posts = [1, 2, 2, 3, 4]
-    res.json({ message: "post sent to frontend", report: true, posts: posts })
+router.get('/', async (req, res) => {
+    if (req.session.isAuth) {
+        const posts = await Post.find().sort('-timestamp').exec()
+
+        res.json({ message: "post sent to frontend", report: true, posts: posts })
+    }
+    else {
+        res.status(401).json({ message: "Unauthorized Access", report: false })
+    }
 })
 
 
