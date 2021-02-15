@@ -56,11 +56,13 @@ function PostForm() {
             <form onSubmit={handlePostSubmit} ref={formRef} autoComplete="off"
                 className="col px-0 px-2 py-2 border rounded shadow-sm" style={{ maxWidth: "600px" }}>
                 <div className="form-group mb-2">
-                    <input type="text" name="post" className="form-control" required placeholder="Type Here.." />
+                    <input type="text" name="post" className="form-control"
+                        required placeholder={`Hey ${user.name}, what's on your Mind?`} />
                 </div>
 
                 <div className="d-flex align-items-center justify-content-between">
-                    <input type="file" name="image" accept="image/*" onChange={handleImageSelect} placeholder="Paste an Image URL (Not Mandatory)" />
+                    <input type="file" name="image" accept="image/*" onChange={handleImageSelect}
+                        placeholder="Paste an Image URL (Not Mandatory)" />
                     <button className="btn btn-primary btn-sm ml-2">POST</button>
                 </div>
             </form>

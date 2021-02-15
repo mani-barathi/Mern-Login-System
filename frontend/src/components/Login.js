@@ -31,7 +31,6 @@ function Login() {
                 return alert('Passwords do not match')
 
             const response = await signup(user)
-            console.log(response)
             if (!response.report) {
                 setFeedback({ message: response.message, type: 0 })
                 formRef.current.password.value = ''
@@ -47,7 +46,6 @@ function Login() {
             }
         } else {   // Login
             const response = await login(user)
-            console.log(response)
             if (!response.report) {
                 setFeedback({ message: response.message, type: 0 })
                 formRef.current.password.value = ''

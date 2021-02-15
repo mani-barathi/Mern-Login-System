@@ -5,9 +5,21 @@ const router = Router()
 
 router.get('/', async (req, res) => {
     if (req.session.isAuth) {
-        const posts = await Post.find().sort('-timestamp').exec()
+        try {
+            const skip = parseInt(req.query.skip) || 0
+            const perPage = 5
+            const totalCount = await Post.countDocuments()
+            const posts = await Post.find().sort('-timestamp')
+                .limit(perPage).skip(skip)
+                .exec()
 
-        res.json({ message: "post sent to frontend", report: true, posts: posts })
+            const hasMore = ((skip + perPage) < totalCount) ? true : false
+
+            res.json({ message: "Post sent to Frontend", report: true, posts: posts, hasMore: hasMore })
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ message: "Server Error", report: false })
+        }
     }
     else {
         res.status(401).json({ message: "Unauthorized Access", report: false })
