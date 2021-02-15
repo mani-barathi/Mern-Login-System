@@ -16,8 +16,8 @@ app.use(cors({
     credentials: true                         // enable set cookie
 }))
 
-app.use(express.json());                            // for json 
-app.use(express.urlencoded({ extended: true }));    // x-www-form-urlencoded header requests
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }))
 
 mongoose.connect(process.env.DB_URL, {
     useNewUrlParser: true,

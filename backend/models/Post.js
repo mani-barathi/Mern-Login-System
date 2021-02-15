@@ -6,7 +6,12 @@ const Post = new Schema({
     authorId: String,
     authorName: String,
     text: String,
-    imageUrl: String
+    imageName: String,
+    imageUrl: String,
+    publicId: String,
+    timestamp: {
+        type: String
+    },
 })
 
 module.exports = mongoose.model("Post", Post)

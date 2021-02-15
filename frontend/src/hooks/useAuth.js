@@ -1,6 +1,6 @@
 import { useStateValue } from "../contexts/StateContext"
 
-const BASE_URL = 'http://localhost:5000'
+const BASE_URL = 'http://localhost:5000/api'
 
 function useAuth() {
     const [, dispatch] = useStateValue()

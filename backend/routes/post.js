@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const Post = require('../models/Post')
-const User = require('../models/User')
+const cloudinary = require("../utils/cloudinary")
 const router = Router()
 
 router.get('/', (req, res) => {
@@ -10,17 +10,23 @@ router.get('/', (req, res) => {
 
 
 router.post('/', async (req, res) => {
-    const data = req.body
-    if (req.session.isAuth) {
-        console.log(`${req.session._id} ---> ${text}`)
-        data.imageUrl = data.imageUrl || null
-        const author = await User.findById(req.session._id)
-        data.authorName = author.name
-        data.aithorId = author.id
-        console.log(data)
-        const newPost = await new Post(post)
-        console.log(newPost)
+    const { authorId, authorName, text, imageData, imageName } = req.body
 
+    if (req.session.isAuth && req.session._id == authorId) {
+        const post = { authorId, authorName, text }
+        post.timestamp = Date.now()
+
+        if (imageData) {
+            const result = await cloudinary.uploader.upload(imageData)
+            console.log(result)
+            post.imageName = imageName
+            post.imageUrl = result.secure_url
+            post.publicId = result.public_id
+        }
+
+        const newPost = await new Post(post)
+        newPost.save()
+        console.log(`${newPost.authorName} has uploaded a New Post`)
         res.status(201).json({ message: "post created", report: true, post: { text: "hello", imageUrl: "image.jpg" } })
     }
     else {

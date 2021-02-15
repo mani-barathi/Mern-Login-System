@@ -1,6 +1,7 @@
 import './css/App.css'
 import Login from "./components/Login"
 import Navbar from "./components/Navbar"
+import PostForm from "./components/PostForm"
 
 import { useStateValue } from "./contexts/StateContext"
 
@@ -13,7 +14,7 @@ function App() {
         <>
           <Navbar />
           <div className="container">
-            <h6>{`${user.name} has Logged In!`}</h6>
+            <PostForm />
           </div>
         </>
       ) : (
