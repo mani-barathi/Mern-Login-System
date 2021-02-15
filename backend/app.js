@@ -8,6 +8,7 @@ const app = express()
 
 // importing Routes
 const authRoutes = require('./routes/auth')
+const postRoutes = require('./routes/post')
 
 app.use(cors({
     origin: [process.env.ORIGIN],              //frontend url
@@ -47,7 +48,8 @@ app.get('/', (req, res) => {
 })
 
 // Routes
-app.use('/auth', authRoutes)
+app.use('/api/auth', authRoutes)
+app.use('/api/post', postRoutes)
 
 
 app.listen(process.env.PORT, () => console.log(`App running at http://localhost:${process.env.PORT}/`))
