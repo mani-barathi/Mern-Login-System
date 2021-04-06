@@ -1,11 +1,14 @@
 import React, { useState } from "react";
+import Comment from "./Comment";
 import CommentBox from "./CommentBox";
 
 function Post({ data }) {
   const [showComments, setShowComments] = useState(false);
 
   const [comments, setComments] = useState([
-    { authorId: "123", authorName: "mani", text: "this is a comment" },
+    { id: 1, authorId: "123", authorName: "mani", text: "this is a comment" },
+    { id: 2, authorId: "123", authorName: "mani", text: "this is a comment" },
+    { id: 3, authorId: "123", authorName: "mani", text: "this is a comment" },
   ]);
 
   const toggleComments = () => setShowComments((prev) => !prev);
@@ -26,32 +29,23 @@ function Post({ data }) {
             <h5 className="mt-0 ml-2">{data.authorName}</h5>
           </div>
           {data.imageUrl && <img src={data.imageUrl} className="img-fluid" />}
-          <p>{data.text}</p>
+          <p style={{ fontSize: "1.1rem" }}>{data.text}</p>
         </div>
       </div>
 
-      {comments.length > 0 && (
-        <div>
-          <div className="px-2">
-            <button
-              className="btn btn-sm btn-info mb-2"
-              onClick={toggleComments}
-            >
-              Comments: {comments.length}
-            </button>
-          </div>
+      <div className="px-2">
+        <button className="btn btn-sm btn-info mb-2" onClick={toggleComments}>
+          Comments: {comments.length}
+        </button>
+      </div>
 
-          {showComments &&
-            comments.map((comment) => (
-              <div>
-                <small className="font-weight-bold mr-2">
-                  {comment.authorName}
-                </small>
-                <span>{comment.text}</span>
-              </div>
-            ))}
-        </div>
-      )}
+      <div>
+        {comments.length > 0 &&
+          showComments &&
+          comments.map((comment) => (
+            <Comment key={comment.id} comment={comment} />
+          ))}
+      </div>
 
       <CommentBox />
     </div>
