@@ -6,6 +6,10 @@ const Post = new Schema({
     authorId: String,
     authorName: String,
     text: String,
+    noOfComments:{
+        type:Number,
+        default : 0
+    },
     imageName: String,
     imageUrl: String,
     publicId: String,
