@@ -4,7 +4,6 @@ import CommentBox from "./CommentBox";
 
 function Post({ data }) {
   const [showComments, setShowComments] = useState(false);
-
   const [comments, setComments] = useState([
     { id: 1, authorId: "123", authorName: "mani", text: "this is a comment" },
     { id: 2, authorId: "123", authorName: "mani", text: "this is a comment" },
@@ -39,15 +38,14 @@ function Post({ data }) {
         </button>
       </div>
 
-      <div>
-        {comments.length > 0 &&
+      <div>        {comments.length > 0 &&
           showComments &&
           comments.map((comment) => (
             <Comment key={comment.id} comment={comment} />
           ))}
       </div>
 
-      <CommentBox />
+      <CommentBox  postId={data._id} />
     </div>
   );
 }
