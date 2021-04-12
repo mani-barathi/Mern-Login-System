@@ -1,19 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Comment from "./Comment";
 import CommentBox from "./CommentBox";
 
 function Post({ data }) {
+  const [noOfComments, setNoOfComments] = useState(data.noOfComments);
   const [showComments, setShowComments] = useState(false);
-  const [comments, setComments] = useState([
-    { id: 1, authorId: "123", authorName: "mani", text: "this is a comment" },
-    { id: 2, authorId: "123", authorName: "mani", text: "this is a comment" },
-    { id: 3, authorId: "123", authorName: "mani", text: "this is a comment" },
-  ]);
+  const [comments, setComments] = useState([]);
+  const [fetched, setFetched] = useState(false);
+  const [newComment, setNewComment] = useState(null);
 
-  const toggleComments = () => setShowComments((prev) => !prev);
+  // this gets Triggered when the user creates a new comment
+  useEffect(() => {
+    if (!newComment) return;
+
+    setNoOfComments((prev) => prev + 1);
+    if (fetched) {
+      return setComments((prev) => [...prev, newComment]);
+    }
+  }, [newComment]);
+
+  const toggleComments = async () => {
+    setShowComments((prev) => !prev);
+    if (fetched) return;
+
+    const response = await fetch(
+      "http://localhost:5000/api/comment/getcomments?" +
+        new URLSearchParams({
+          postId: data._id,
+        }),
+      {
+        credentials: "include",
+      }
+    );
+    const resData = await response.json();
+    if (resData.report) {
+      console.log(resData.comments);
+      setComments((prev) => [...prev, ...resData.comments]);
+    }
+    setFetched(true);
+  };
 
   return (
-    <div className="mb-5 border-bottom shadow rounded">
+    <div className="mb-5 border-bottmom shadow rounded">
       <div
         className="row justify-content-center"
         style={{ margin: "0.5rem 0.1rem" }}
@@ -34,18 +62,20 @@ function Post({ data }) {
 
       <div className="px-2">
         <button className="btn btn-sm btn-info mb-2" onClick={toggleComments}>
-          Comments: {comments.length}
+          Comments: {noOfComments}
         </button>
       </div>
 
-      <div>        {comments.length > 0 &&
+      <div>
+        {" "}
+        {comments.length > 0 &&
           showComments &&
           comments.map((comment) => (
-            <Comment key={comment.id} comment={comment} />
+            <Comment key={comment._id} comment={comment} />
           ))}
       </div>
 
-      <CommentBox  postId={data._id} />
+      <CommentBox postId={data._id} setNewComment={setNewComment} />
     </div>
   );
 }
